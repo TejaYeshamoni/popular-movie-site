@@ -25,9 +25,12 @@ const Popular = () => {
     const getPopularMovieData = async () => {
       const apiKey = '32ebf2a57379d3ebe7dd7baf7a315ffd'
       const getPopularMoviesURL = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-US&page=${page}`
-      const response = await fetch(getPopularMoviesURL)
-      const data = await response.json()
-      if (response.ok) {
+      try {
+        const response = await fetch(getPopularMoviesURL)
+        if (!response.ok) {
+          throw new Error('HTTP error ' + response.status)
+        }
+        const data = await response.json()
         const results = data.results.map(each => ({
           id: each.id,
           title: each.title,
@@ -38,10 +41,12 @@ const Popular = () => {
         const totalPages = data.total_pages
         setPopularMovieData({results, totalPages})
         setApiStatus(apiStatusConstants.success)
+      } catch (error) {
+        console.error('Fetch failed:', error)
+        
       }
     }
-    
-
+  
     getPopularMovieData()
   }, [page])
 
